@@ -43,7 +43,7 @@ e2e:
 	docker-compose -f test/e2e-compose.yml up	
 
 build-minimal:
-	docker build -t octoprint/octoprint:minimal -f minimal/Dockerfile --build-arg octoprint_ref=${octoprint_ref} ./minimal
+	docker build --tag octoprint/octoprint:minimal --file minimal/Dockerfile ./minimal
 
 test-minimal:
 	docker run -it --name octoprint_minimal -p 55000:5000 octoprint/octoprint:minimal

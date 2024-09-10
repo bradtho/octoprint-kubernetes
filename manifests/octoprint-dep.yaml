@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: octoprint-dev
+  namespace: octoprint-dev
+spec:
+  selector:
+    matchLabels:
+      app: octoprint-dev 
+  replicas: 1
+  revisionHistoryLimit: 1
+  template:
+    metadata:
+      labels:
+        app: octoprint-dev
+    spec:
+      containers:
+      - name: octoprint-dev
+        image: bradtho/octoprint:1.10.2-minimal
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        ports:
+          - name: http
+            containerPort: 5000
+        volumeMounts:
+        # - mountPath: /octoprint
+        #   name: octoprint-dev
+        #   readOnly: false
+        - mountPath: /dev/ttyACM0
+          name: ttyacm0
+          readOnly: false
+      nodeSelector:
+        kubernetes.io/hostname: grumpynode2
+      volumes:
+      # - name: octoprint-dev
+      #   persistentVolumeClaim:
+      #     claimName: octoprint-dev
+      - name: ttyacm0
+        hostPath:
+          path: /dev/ttyACM0
+          type: CharDevice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: octoprint-dev-svc
+  namespace: octoprint-dev
+  labels:
+    app: octoprint-dev
+spec:
+  type: ClusterIP
+  selector:
+    app: octoprint-dev
+  ports:
+    - name: http
+      protocol: TCP
+      port: 5000
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: octoprint-dev
+  namespace: octoprint-dev
+  labels:
+    app: octoprint-dev
+spec:
+  rules:
+    - http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: octoprint-dev-svc
+              port:
+                name: http
+  ingressClassName: tailscale
+  tls:
+    - hosts:
+      - octoprint-dev.minotaur-gamma.ts.net
+      secretName: octoprint-dev-tls
