@@ -1,6 +1,6 @@
 builddir=.build
 cachedir=.cache
-octoprint_ref?= $(shell ./scripts/version.sh "OctoPrint/OctoPrint")
+octoprint_ref?=$(shell ./scripts/version.sh "OctoPrint/OctoPrint")
 platforms?="linux/arm/v7,linux/arm64,linux/amd64"
 
 .PHONY: test
@@ -43,10 +43,22 @@ e2e:
 	docker-compose -f test/e2e-compose.yml up	
 
 build-minimal:
-	docker build -t octoprint/octoprint:minimal -f minimal/Dockerfile --build-arg octoprint_ref=${octorprint_ref} ./minimal
+	docker build -t octoprint/octoprint:minimal -f minimal/Dockerfile --build-arg octoprint_ref=${octoprint_ref} ./minimal
 
 test-minimal:
 	docker run -it --name octoprint_minimal -p 55000:5000 octoprint/octoprint:minimal
 
 clean-minimal:	
 	docker rm octoprint_minimal
+
+multi-arch-minimal:
+	cd minimal && mkdir -p ${cachedir} ${builddir} && \
+	docker buildx build \
+		--platform ${platforms} \
+		--cache-from type=local,src=${cachedir} \
+		--cache-to type=local,dest=${cachedir} \
+		--build-arg octoprint_ref=${octoprint_ref} \
+		--output type=local,dest=${builddir} \
+		--progress tty \
+		--tag bradtho/octoprint:${octoprint_ref}-minimal . \
+		--push 
