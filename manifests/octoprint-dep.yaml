@@ -6,7 +6,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: octoprint-dev 
+      app: octoprint-dev
   replicas: 1
   revisionHistoryLimit: 1
   template:
@@ -21,7 +21,7 @@ spec:
         securityContext:
           privileged: true
         ports:
-          - name: http
+          - name: octoprint
             containerPort: 5000
         volumeMounts:
         - mountPath: /octoprint
@@ -53,10 +53,10 @@ spec:
   selector:
     app: octoprint-dev
   ports:
-    - name: http
+    - name: octoprint
       protocol: TCP
       port: 5000
-      targetPort: http
+      targetPort: octoprint
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -75,7 +75,7 @@ spec:
             service:
               name: octoprint-dev-svc
               port:
-                name: http
+                name: octoprint
   ingressClassName: tailscale
   tls:
     - hosts:
