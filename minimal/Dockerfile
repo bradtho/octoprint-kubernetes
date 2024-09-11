@@ -1,9 +1,9 @@
-ARG PYTHON_BASE_IMAGE=3.11-slim-bookworm
+ARG PYTHON_BASE_IMAGE=3-slim-bookworm
 
 FROM python:${PYTHON_BASE_IMAGE} AS build
 
 SHELL ["/bin/bash", "-c"]
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
   build-essential \
   libffi-dev
   
@@ -12,19 +12,21 @@ RUN groupadd --gid 1000 octoprint \
   && mkdir -p /octoprint/octoprint /octoprint/plugins \
   && chown -R octoprint:octoprint /octoprint
 
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
 USER octoprint
 
 WORKDIR /home/octoprint
 
 SHELL ["/bin/bash", "-c"]
-RUN	mkdir octoprint && cd octoprint \
-  && python3 -m venv venv \
-  && source venv/bin/activate \
-  && pip install --no-cache-dir octoprint
-
-WORKDIR /home/octoprint/octoprint/venv/bin  
+RUN	mkdir octoprint \
+  && python3 -m venv octoprint \
+  && source octoprint/bin/activate \
+  && pip install --no-cache-dir octoprint \
+  && pip install --no-cache-dir "https://github.com/tg44/OctoPrint-Prometheus-Exporter/archive/master.zip"
 
 VOLUME /octoprint
 EXPOSE 5000
 
-CMD ["/home/octoprint/octoprint/venv/bin/octoprint", "--basedir", "/octoprint/octoprint", "serve"]
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["./octoprint/bin/octoprint", "--basedir", "/octoprint/octoprint", "serve"]
