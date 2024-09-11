@@ -1,8 +1,8 @@
-ARG PYTHON_BASE_IMAGE=3.8-slim-buster
+ARG PYTHON_BASE_IMAGE=3.12.2-slim-bookworm
 
 FROM ubuntu AS s6build
 ARG S6_RELEASE
-ENV S6_VERSION ${S6_RELEASE:-v2.1.0.0}
+ENV S6_VERSION ${S6_RELEASE:-v3.2.0.0}
 RUN apt-get update && apt-get install -y curl
 RUN echo "$(dpkg --print-architecture)"
 WORKDIR /tmp

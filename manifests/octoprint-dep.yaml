@@ -24,18 +24,18 @@ spec:
           - name: http
             containerPort: 5000
         volumeMounts:
-        # - mountPath: /octoprint
-        #   name: octoprint-dev
-        #   readOnly: false
+        - mountPath: /octoprint
+          name: octoprint-dev
+          readOnly: false
         - mountPath: /dev/ttyACM0
           name: ttyacm0
           readOnly: false
       nodeSelector:
         kubernetes.io/hostname: grumpynode2
       volumes:
-      # - name: octoprint-dev
-      #   persistentVolumeClaim:
-      #     claimName: octoprint-dev
+      - name: octoprint-dev
+        persistentVolumeClaim:
+          claimName: octoprint-dev
       - name: ttyacm0
         hostPath:
           path: /dev/ttyACM0

@@ -52,12 +52,13 @@ clean-minimal:
 	docker rm octoprint_minimal
 
 multi-arch-minimal:
+	./scripts/buildx_check.sh
+	@echo '[buildx]: building .Dockerfile for all supported architectures and caching locally'
 	cd minimal && mkdir -p ${cachedir} ${builddir} && \
 	docker buildx build \
 		--platform ${platforms} \
 		--cache-from type=local,src=${cachedir} \
 		--cache-to type=local,dest=${cachedir} \
-		--build-arg octoprint_ref=${octoprint_ref} \
 		--output type=local,dest=${builddir} \
 		--progress tty \
 		--tag bradtho/octoprint:${octoprint_ref}-minimal . \
