@@ -13,6 +13,10 @@ spec:
     metadata:
       labels:
         app: octoprint-dev
+      annotations:
+        prometheus.io/path: '/plugin/prometheus_exporter/metrics'
+        prometheus.io/port: '5000'
+        prometheus.io/scrape: 'true'
     spec:
       containers:
       - name: octoprint-dev
